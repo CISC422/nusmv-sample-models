@@ -1,2 +1,2 @@
-# Alloy Sample Models
+# NuSMV Sample Models
 See CISC/CMPE 422/835 course notes for details.
