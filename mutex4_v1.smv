@@ -1,0 +1,53 @@
+-- CISC/CMPE 422/835
+-- SMV model of '4th attempt (v1)' given in course notes
+-- . Asynchronous, fair model allowing non-termininating non-critical section
+-- . Version 1: 'req' and 'last' get set simultaneously
+-- . Satisfies mutex and eventual entry
+MODULE P(id, myReq, otherReq, last)
+VAR
+  pc : {nc, en1, en2, cr, ex};
+ASSIGN
+  init(pc) := nc;
+  next(pc) := 
+    case
+      pc=nc : {nc, en1};
+      pc=en1 : en2;
+      pc=en2 & myReq & (!otherReq | last!=id) : cr;
+      pc=cr : ex;
+      pc=ex : nc;
+      TRUE : pc;
+    esac;
+  next(myReq) :=
+    case
+      pc=en1 : TRUE;
+      pc=ex : FALSE;
+      TRUE : myReq;
+    esac;
+  next(last) :=
+    case
+      pc=en1 : id;
+      TRUE : last;
+    esac;
+FAIRNESS
+  running
+
+MODULE main
+VAR
+  p0 : process P(0, req0, req1, last);
+  p1 : process P(1, req1, req0, last);
+  req0 : boolean;
+  req1 : boolean;
+  last : 0..1;
+ASSIGN
+  init(req0) := FALSE;
+  init(req1) := FALSE;
+
+SPEC 
+  AG !(p0.pc=cr & p1.pc=cr)  -- holds
+
+SPEC
+  AG (p0.pc=en1 -> AF p0.pc=cr)  -- holds
+
+SPEC
+  AG (p1.pc=en1 -> AF p1.pc=cr)  -- holds
+

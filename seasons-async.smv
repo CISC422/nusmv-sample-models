@@ -1,0 +1,73 @@
+-- CISC/CMPE 422/835
+-- contains two processes moving asynchronously
+-- the first one cycles through the seasons in english
+-- the second cycles through the seasons in german
+MODULE Canada
+VAR
+  season : {spring, summer, fall, winter};
+ASSIGN
+  init(season) := spring;
+  next(season) := 
+    case
+      season=spring : summer;
+      season=summer : fall;
+      season=fall : winter;
+      season=winter : spring;
+    esac;
+  
+MODULE Germany
+VAR
+  jahreszeit : {Fruehling, Sommer, Herbst, Winter};
+ASSIGN
+  init(jahreszeit) := Fruehling;
+  next(jahreszeit) :=
+    case
+      jahreszeit=Fruehling : Sommer;
+      jahreszeit=Sommer : Herbst;
+      jahreszeit=Herbst : Winter;
+      jahreszeit=Winter : Fruehling;
+    esac;
+
+MODULE main
+VAR 
+  c : process Canada;
+  g : process Germany;
+  
+-- PROPERTIES REQUIRING SYNCHRONOUS EXECUTION
+-- "It's spring in Canada iff it's Fruehling in Germany"
+SPEC AG ((c.season=spring) <-> g.jahreszeit=Fruehling)
+
+-- "There exists a path along which there exists a state
+-- in which it is spring in Canada and not Fruehling in Germany"
+SPEC EF ((c.season=spring) & (g.jahreszeit!=Fruehling))
+
+-- PROPERTIES REQUIRING FAIRNESS
+
+-- For Canada, i.e, the following will fail w/o
+--  'FAIRNESS running' in 'MODULE Canada'  
+-- "It will always be summer in Canada eventually"
+SPEC AF (c.season=summer)
+
+-- If it's Fruehling in Germany then it'll always be spring in Canada eventually
+SPEC AG ((g.jahreszeit=Fruehling) -> AF c.season=spring)
+    
+-- "Along all paths, it is summer in Canada infinitely often"
+SPEC AG AF (c.season=summer)
+
+-- For Germany, i.e, the following will fail w/o
+--  'FAIRNESS running' in 'MODULE Germany'  
+
+-- "It will always be summer in Germany eventually"
+SPEC AF (g.jahreszeit=Sommer)
+  
+-- If it's spring in Canada then it'll always be Fruehling in Germany eventually
+SPEC AG ((c.season=spring) -> AF g.jahreszeit=Fruehling)
+
+-- Along all paths, it is Fruehling in Germany in infinitely often
+SPEC AG AF (g.jahreszeit=Fruehling)
+
+
+
+
+
+

@@ -1,0 +1,57 @@
+-- CISC/CMPE 422/835
+-- SMV model of '2nd attempt' in course notes
+-- . Asynchronous, fair model allowing non-terminating non-critical section
+-- . Access to critical section granted using a variable 'turn' that gets
+--   updated using a 'request' flag
+-- . Satisfies mutual exclusion, but not eventual entry because process allowed
+--   to enter critical section initially, may never do so
+MODULE P(id, myReq, otherReq, turn)
+VAR
+  pc : {nc, en1, en2, cr, ex1, ex2};
+ASSIGN
+  init(pc) := nc;
+  next(pc) := 
+    case
+      pc=nc : {nc, en1};
+      pc=en1 : en2;
+      pc=en2 & turn=id : cr;
+      pc=cr : ex1;
+      pc=ex1 : ex2;
+      pc=ex2 : nc;
+      TRUE : pc;
+    esac;
+  next(myReq) :=
+    case
+      pc=en1 : TRUE;
+      pc=ex1 : FALSE;
+      TRUE : myReq;
+    esac;
+  next(turn) := 
+    case
+      pc=ex2 & otherReq : (id+1) mod 2;
+      TRUE : turn;
+    esac;
+FAIRNESS
+  running
+
+MODULE main
+VAR
+  p0 : process P(0, req0, req1, turn);
+  p1 : process P(1, req1, req0, turn);
+  turn : 0..1;
+  req0 : boolean;
+  req1 : boolean;
+ASSIGN
+  init(turn) := 0;
+  init(req0) := FALSE;
+  init(req1) := FALSE;
+
+SPEC -- safety: mutual exclusion
+  AG !(p0.pc=cr & p1.pc=cr)  -- holds
+
+SPEC -- liveness/progress: eventual entry for p0
+  AG (p0.pc=en1 -> AF p0.pc=cr)  -- doesn't hold
+
+SPEC -- liveness/progress: eventual entry for p1
+  AG (p1.pc=en1 -> AF p1.pc=cr)  -- doesn't hold
+

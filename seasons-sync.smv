@@ -1,0 +1,67 @@
+-- CISC/CMPE 422/835
+-- contains two processes moving synchronously
+-- the first one cycles through the seasons in english
+-- the second cycles through the seasons in german
+MODULE Canada
+VAR
+  season : {spring, summer, fall, winter};
+ASSIGN
+  init(season) := spring;
+  next(season) := 
+    case
+      season=spring : summer;
+      season=summer : fall;
+      season=fall : winter;
+      season=winter : spring;
+    esac;
+
+MODULE Germany
+VAR
+  jahreszeit : {Fruehling, Sommer, Herbst, Winter};
+ASSIGN
+  init(jahreszeit) := Fruehling;
+  next(jahreszeit) :=
+    case
+      jahreszeit=Fruehling : Sommer;
+      jahreszeit=Sommer : Herbst;
+      jahreszeit=Herbst : Winter;
+      jahreszeit=Winter : Fruehling;
+    esac;
+
+MODULE main
+VAR 
+  c : Canada;
+  g : Germany;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+-- "It's spring in Canada iff it's Fruehling in Germany"
+SPEC AG ((c.season=spring) <-> g.jahreszeit=Fruehling)
+
+-- "There exists a path along which there exists a state
+-- in which it is spring in Canada and not Fruehling in Germany"
+SPEC EF ((c.season=spring) & (g.jahreszeit!=Fruehling))
+-- this will fail
+-- notice how NuSMV cannot really produce a counter example in
+-- this case (b/c the non-existence of a path has to be
+-- demonstrated
+
+
+
+
+
+

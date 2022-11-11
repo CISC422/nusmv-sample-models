@@ -1,0 +1,50 @@
+-- CISC/CMPE 422/835
+-- SMV model of '3rd attempt' given in course notes
+-- . Asynchronous, fair model allowing non-termininating non-critical section
+-- . Access granted using a 'request' flag 
+-- . Satisfies mutex, but not eventual entry, because processes may deadlock
+--   as they all get stuck in their entry protocol 
+MODULE P(id, myReq, otherReq)
+VAR
+  pc : {nc, en1, en2, cr, ex};
+ASSIGN
+  init(pc) := nc;
+  next(pc) := 
+    case
+      pc=nc : {nc, en1};
+      pc=en1 : en2;
+      pc=en2 & !otherReq : cr;
+      pc=cr : ex;
+      pc=ex : nc;
+      TRUE : pc;
+    esac;
+  next(myReq) :=
+    case
+      pc=en1 : TRUE;
+      pc=ex : FALSE;
+      TRUE : myReq;
+    esac;
+FAIRNESS
+  running
+
+MODULE main
+VAR
+  P0 : process P(0, req0, req1);
+  p1 : process P(1, req1, req0);
+  req0 : boolean;
+  req1 : boolean;
+ASSIGN
+  init(req0) := FALSE;
+  init(req1) := FALSE;
+
+SPEC -- safety: mutual exclusion
+  AG !(p0.pc=cr & p1.pc=cr)  -- holds
+
+SPEC -- liveness/progress: eventual entry for p0
+  AG (p0.pc=en1 -> AF p0.pc=cr)  -- does not hold
+
+SPEC -- liveness/progress: eventual entry for p1
+  AG (p1.pc=en1 -> AF p1.pc=cr)  -- does not hold
+
+
+

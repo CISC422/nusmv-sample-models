@@ -1,0 +1,4 @@
+* text=auto
+*.smv text
+*.md text
+*.jpg -text

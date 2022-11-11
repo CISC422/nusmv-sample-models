@@ -1,0 +1,32 @@
+-- CISC/CMPE 422/835
+-- 3-bit counter
+-- Version 3: 4 synchronous processes (one process per bit)
+--            behaviour defined in way that highlights commonality
+MODULE counter_cell(carry_in)
+VAR
+  v : boolean;
+
+ASSIGN
+  init(v) := FALSE;
+  next(v) := v xor carry_in;
+
+DEFINE
+  carry_out := v & carry_in;
+-- END MODULE counter_cell
+
+MODULE main
+VAR
+  b0 : counter_cell(TRUE);
+  b1 : counter_cell(b0.carry_out);
+  b2 : counter_cell(b1.carry_out);
+-- END MODULE main
+
+SPEC
+  AG AF b2.carry_out
+
+-- SPEC 
+--   AG !b0.v
+
+SPEC 
+  AG (b0.v & b1.v & b2.v -> AX (!b0.v & !b1.v & !b2.v))
+

@@ -1,0 +1,50 @@
+-- CISC/CMPE 422/835
+-- SMV model of '1st attempt' in course notes
+-- . Asynchronous, fair model assuming finite non-critical section
+-- . Access to critical section granted using a variable 'turn' that gets
+--   updated in a 'round robin' fashion
+-- . Satisfies mutual exclusion and eventual entry
+-- . Works fine, but is based on assumption that non-critical section 
+--   is always terminating
+-- . Parameter 'id' used by value, parameter 'turn' used by reference
+MODULE P(id, turn)
+VAR
+  pc : {nc, cr};
+ASSIGN
+  init(pc) := nc;
+  next(pc) := 
+    case
+      pc=nc & turn=id : cr;   -- get into critical section 
+      pc=cr : nc;             -- get out of critical section right away
+      TRUE : pc;              -- don't change value of 'pc' 
+    esac;
+  next(turn) := 
+    case
+      pc=cr : (turn+1) mod 2;
+      TRUE : turn;
+    esac;
+FAIRNESS
+  running
+
+MODULE main
+VAR
+  p0 : process P(0, turn);
+  p1 : process P(1, turn);
+  turn : 0..1;
+
+
+SPEC -- safety: mutual exclusion
+  AG !(p0.pc=cr & p1.pc=cr)  -- holds
+
+SPEC -- liveness/progress: eventual entry for p0
+  AG (p0.pc=nc -> AF p0.pc=cr)  -- holds
+
+SPEC -- liveness/progress: eventual entry for p1
+  AG (p1.pc=nc -> AF p1.pc=cr)  -- holds
+
+SPEC -- liveness/progress: p0 in critical section infintely often
+  AG AF p0.pc=cr  -- holds
+
+SPEC -- liveness/progreess: p1 in critical section infintely often
+  AG AF p1.pc=cr  -- holds
+
