@@ -1,0 +1,42 @@
+-- CISC/CMPE 422/835
+-- a simple counter
+MODULE Proc
+
+VAR                -- declaration section
+n : {1,2,3,4};  
+
+ASSIGN  
+  init(n) := 1;    -- what is the value of 'n' in the initial state?
+-- init(n) := {1,2};   
+
+  next(n) :=       -- how does the value of 'n' change from one state to the next?
+    case
+      n=4: 1;              -- if 'n=4', make 'n' have value '1' in next state
+--    n=3: {n,n+1};        -- if 'n=3', 'n' can be '3' or '4' in next state
+      TRUE: n+1;           -- increment 'n' if none of the guards above hold
+    esac;
+-- END MODULE Proc
+
+MODULE main
+VAR
+  p : Proc;
+-- END MODULE main
+
+SPEC
+  p.n=1 -- is n=1 in the initial state?
+
+SPEC
+  AX p.n=2  -- is n=2 in all successors of the initial state?
+
+SPEC
+  AG !(p.n=4)  -- is n!=4 along all paths and in every state?
+  
+SPEC
+  AG (p.n=1 -> AF p.n=4)
+  
+SPEC
+  AG AF p.n=1
+
+
+
+
