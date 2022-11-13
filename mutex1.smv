@@ -32,19 +32,23 @@ VAR
   p1 : process P(1, turn);
   turn : 0..1;
 
+-- safety: mutual exclusion
+SPEC NAME 
+  mutex := AG !(p0.pc=cr & p1.pc=cr)  -- holds
 
-SPEC -- safety: mutual exclusion
-  AG !(p0.pc=cr & p1.pc=cr)  -- holds
+-- liveness/progress: eventual entry for p0
+SPEC NAME
+  ee4p0 := AG (p0.pc=nc -> AF p0.pc=cr)  -- holds
 
-SPEC -- liveness/progress: eventual entry for p0
-  AG (p0.pc=nc -> AF p0.pc=cr)  -- holds
+-- liveness/progress: eventual entry for p1
+SPEC NAME
+  ee4p1 := AG (p1.pc=nc -> AF p1.pc=cr)  -- holds
 
-SPEC -- liveness/progress: eventual entry for p1
-  AG (p1.pc=nc -> AF p1.pc=cr)  -- holds
+-- liveness/progress: p0 in critical section infintely often
+SPEC NAME
+  p0inf := AG AF p0.pc=cr  -- holds
 
-SPEC -- liveness/progress: p0 in critical section infintely often
-  AG AF p0.pc=cr  -- holds
-
-SPEC -- liveness/progreess: p1 in critical section infintely often
-  AG AF p1.pc=cr  -- holds
+-- liveness/progreess: p1 in critical section infintely often
+SPEC NAME
+  p1inf := AG AF p1.pc=cr  -- holds
 

@@ -7,7 +7,7 @@ n : {1,2,3,4};
 
 ASSIGN  
   init(n) := 1;    -- what is the value of 'n' in the initial state?
--- init(n) := {1,2};   
+-- init(n) := {1,2};   -- initial state does not have to be unique
 
   next(n) :=       -- how does the value of 'n' change from one state to the next?
     case
@@ -22,20 +22,45 @@ VAR
   p : Proc;
 -- END MODULE main
 
+-- "is n=1 in the initial state?"
 SPEC
-  p.n=1 -- is n=1 in the initial state?
+  p.n=1 
 
+-- "along All paths p from the initial state, is 'n=2' in the neXt state in p?"
+-- i.e.,
+-- "is 'n=2' in all successors of the initial state?"
 SPEC
-  AX p.n=2  -- is n=2 in all successors of the initial state?
+  AX p.n=2  
 
+-- "along All paths p, in every state s in p (Globally), is 'n!=4' in s?"
+-- i.e.,
+-- "does 'n=4' hold in every reachable state?"
 SPEC
-  AG !(p.n=4)  -- is n!=4 along all paths and in every state?
-  
-SPEC
-  AG (p.n=1 -> AF p.n=4)
-  
+  AG !(p.n=4)  
+
+-- "along All paths p, in every state s in p (Globally), does s satisfy
+-- 'AF p.n=4'?"
+-- i.e.,
+-- "along All paths p, in every state s in p (Globally), do All paths
+-- rooted at s eventually (Finally) lead to a state in which 'n=4'?"
+-- i.e.,
+-- "along every path, does 'n=1' hold infinitely often?"
+-- i.e.,
+-- "does 'AF n=1' hold in every reachable state?"
 SPEC
   AG AF p.n=1
+
+-- "along All paths p, in every state s in p (Globally), does s satsify
+-- 'n=1 -> AF n=4'?"
+-- i.e.,
+-- "along All paths p, in every state s in p (Globally), if 'n=1' in s,
+-- then, do All paths rooted at s eventually (Finally) lead to a state in
+-- which 'n=4'?"
+-- i.e.,
+-- "whenever 'n=1' in any reachable state s, will we always eventually 
+-- reach a state in which 'n=4' no matter which path is chosen from s?"
+SPEC
+  AG (p.n=1 -> AF p.n=4)
 
 
 

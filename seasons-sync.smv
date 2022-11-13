@@ -33,6 +33,13 @@ VAR
   c : Canada;
   g : Germany;
 
+-- "Along all paths p, in every state s in p, it is 'spring' in Canada iff
+-- it is 'fruehling' in Germany"
+-- i.e., 
+-- "It's spring in Canada iff it's Fruehling in Germany"
+-- i.e.,
+-- "The seasons in Canada and Germany are never 'out-of-sync'"
+SPEC AG ((c.season=spring) <-> g.jahreszeit=Fruehling)
 
 
 

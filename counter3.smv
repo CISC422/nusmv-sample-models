@@ -1,4 +1,3 @@
--- CISC/CMPE 422/835
 -- 3-bit counter
 -- Version 3: 4 synchronous processes (one process per bit)
 --            behaviour defined in way that highlights commonality
@@ -21,22 +20,12 @@ VAR
   b2 : counter_cell(b1.carry_out);
 -- END MODULE main
 
--- "'carry_out' of bit 'b2' is set infinitely often"
--- i.e.,
--- "the counter will transition from '7' to '0' infinitely often"
--- i.e.,
--- "it is impossible for the counter to not reach '7' eventually"
 SPEC
   AG AF b2.carry_out
 
--- "along all paths p, in every state s in p, 'b0' is reset in s
--- i.e., 
--- "'b0' is reset in every reachable state"
 -- SPEC 
 --   AG !b0.v
 
--- "along all paths p, in every state s in p, if all bits are set in s,
--- then they will all be reset in all successors of s"
 SPEC 
   AG (b0.v & b1.v & b2.v -> AX (!b0.v & !b1.v & !b2.v))
 

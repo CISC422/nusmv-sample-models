@@ -20,15 +20,39 @@ ASSIGN
 	      b0&b1 : !b2;
 	      TRUE: b2;
 	    esac;
-	    
+
+-- "are all bits are reset in the initial state?"
+-- i.e.,
+-- "does the counter represent '0' in the initial state?"
 SPEC !b0&!b1&!b2
+
+-- "after 1 transition along any path, will b0 and only b0 be set?"
+-- i.e.,
+-- "will the counter always repressent '1' after exactly 1 transition?"
 SPEC AX (b0&!b1&!b2)
+
+-- "after 2 transitions along any path, will b1 and only b1 be set?"
+-- "will the counter always repressent '2' after exactly 2 transitions?"
 SPEC AX AX (!b0&b1&!b2)
+
+-- "after 3 transitions along any path, will b0 and b1 be set and b2 be reset?"
+-- i.e., 
+-- "will the counter always repressent '3' after exactly 3 transitions?"
 SPEC AX AX AX (b0&b1&!b2)
+
 SPEC AX AX AX AX (!b0&!b1&b2)
 SPEC AX AX AX AX AX (b0&!b1&b2)
 SPEC AX AX AX AX AX AX (!b0&b1&b2)
 SPEC AX AX AX AX AX AX AX (b0&b1&b2)
 SPEC AX AX AX AX AX AX AX AX (!b0&!b1&!b2)
+
+-- "along every path p, in every state s in p, will 'AF b2' hold in s?"
+-- i.e.,
+-- "along every path p, in every state s in p, will b2 eventually be set
+-- along every path from s?"
+-- i.e.,
+-- "along every path p, will 'b2' hold infinitely often?"
+-- i.e.,
+-- "it is not the case that there is a path along which 'b2' never holds again"
 SPEC AG AF b2
 

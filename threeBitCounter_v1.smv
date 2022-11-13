@@ -15,18 +15,38 @@ ASSIGN
   next(b1) := (b0 | b1) & !(b0 & b1);
   next(b2) := ((b0 & b1) | b2) & !(b0 & b1 & b2);
 
+-- "is b0 false in the initial state?"
+-- "is b0 reset in the initial state?"
 SPEC 
   b0=FALSE
 
+-- "is b0 false in the initial state?"
 SPEC 
   !b0
 
+-- "along All paths p, is does b0 hold in the neXt state in p?"
+-- i.e.,
+-- "does b0 hold in all successors of the initial state?"
 SPEC 
   AX b0
 
+-- "along All paths p, does AX b1 hold in the neXt state in p",
+-- i.e., "along All paths p, in all paths p' rooted at the next state in p,
+-- does b1 hold in the neXt state of p'"?
+-- i.e.,
+-- "does b1 hold in all successors of all successors?"
+-- i.e.,
+-- "after taking exactly two transitions from the initial state, will b1 hold?"
 SPEC 
   AX AX b1
 
+-- "along All paths p, in every state s in p, does 'AF (b0&b1&b2)' hold in s?"
+-- i.e.,
+-- "along All paths p, in every state s in p, will 'b0&b1&b2' hold eventually 
+-- along all paths rooted at s?"
+-- i.e.,
+-- "it is not the case that there is a reachable state s such that there 
+-- exists a path rooted at s along which 'b0&b1&b2' never holds?"
 SPEC 
   AG AF (b0 & b1 & b2)
 

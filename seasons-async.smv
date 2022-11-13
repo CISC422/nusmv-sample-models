@@ -14,6 +14,7 @@ ASSIGN
       season=fall : winter;
       season=winter : spring;
     esac;
+-- FAIRNESS running    
   
 MODULE Germany
 VAR
@@ -27,21 +28,24 @@ ASSIGN
       jahreszeit=Herbst : Winter;
       jahreszeit=Winter : Fruehling;
     esac;
+-- FAIRNESS running
 
 MODULE main
 VAR 
   c : process Canada;
   g : process Germany;
   
--- PROPERTIES REQUIRING SYNCHRONOUS EXECUTION
+-- PROPERTIES REQUIRING SYNCHRONOUS EXECUTION ---------------
 -- "It's spring in Canada iff it's Fruehling in Germany"
-SPEC AG ((c.season=spring) <-> g.jahreszeit=Fruehling)
+SPEC NAME
+   inSync := AG ((c.season=spring) <-> g.jahreszeit=Fruehling)
 
 -- "There exists a path along which there exists a state
 -- in which it is spring in Canada and not Fruehling in Germany"
-SPEC EF ((c.season=spring) & (g.jahreszeit!=Fruehling))
+SPEC NAME
+   outOfSync := EF ((c.season=spring) & (g.jahreszeit!=Fruehling))
 
--- PROPERTIES REQUIRING FAIRNESS
+-- PROPERTIES REQUIRING FAIRNESS ----------------------------
 
 -- For Canada, i.e, the following will fail w/o
 --  'FAIRNESS running' in 'MODULE Canada'  
