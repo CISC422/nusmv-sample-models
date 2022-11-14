@@ -19,6 +19,9 @@ VAR
   b0 : counter_cell(TRUE);
   b1 : counter_cell(b0.carry_out);
   b2 : counter_cell(b1.carry_out);
+DEFINE
+  zero  := !b0.v & !b1.v & !b2.v;
+  seven :=  b0.v &  b1.v &  b2.v;
 -- END MODULE main
 
 -- "'carry_out' of bit 'b2' is set infinitely often"
@@ -35,8 +38,8 @@ SPEC
 -- SPEC 
 --   AG !b0.v
 
--- "along all paths p, in every state s in p, if all bits are set in s,
--- then they will all be reset in all successors of s"
+-- "along all paths p, in every state s in p, if the counter represents 7
+-- in s, then it will represent 0 in all successors of s"
 SPEC 
-  AG (b0.v & b1.v & b2.v -> AX (!b0.v & !b1.v & !b2.v))
+  AG (seven -> AX zero)
 
