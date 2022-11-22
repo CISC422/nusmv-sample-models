@@ -9,18 +9,21 @@
 -- . Parameter 'id' used by value, parameter 'turn' used by reference
 MODULE P(id, turn)
 VAR
-  pc : {nc, cr};
+  pc : {en, nc, cr, ex};
 ASSIGN
   init(pc) := nc;
   next(pc) := 
     case
-      pc=nc & turn=id : cr;   -- get into critical section 
-      pc=cr : nc;             -- get out of critical section right away
+      pc=nc : en;              
+--    pc=nc : {nc,en};              
+      pc=en & turn=id : cr;   -- get into critical section 
+      pc=cr : ex;             -- get out of critical section right away
+      pc=ex : nc;
       TRUE : pc;              -- don't change value of 'pc' 
     esac;
   next(turn) := 
     case
-      pc=cr : (turn+1) mod 2;
+      pc=ex : (turn+1) mod 2;
       TRUE : turn;
     esac;
 FAIRNESS
@@ -31,7 +34,9 @@ VAR
   p0 : process P(0, turn);
   p1 : process P(1, turn);
   turn : 0..1;
+  
 
+  
 -- safety: mutual exclusion
 SPEC NAME 
   mutex := AG !(p0.pc=cr & p1.pc=cr)  -- holds
