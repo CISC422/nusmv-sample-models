@@ -13,7 +13,7 @@ ASSIGN
       pc=nc : {nc, en1};
       pc=en1 : en2;
       pc=en2 : en3;
-      pc=en3 & myReq & (!otherReq | last!=id) : cr;
+      pc=en3 & (!otherReq | last!=id) : cr;
       pc=cr : ex;
       pc=ex : nc;
       TRUE : pc;

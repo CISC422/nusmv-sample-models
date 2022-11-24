@@ -12,7 +12,7 @@ ASSIGN
     case
       pc=nc : {nc, en1};
       pc=en1 : en2;
-      pc=en2 & myReq & (!otherReq | last!=id) : cr;
+      pc=en2 & (!otherReq | last!=id) : cr;
       pc=cr : ex;
       pc=ex : nc;
       TRUE : pc;
