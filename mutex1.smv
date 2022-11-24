@@ -14,8 +14,8 @@ ASSIGN
   init(pc) := nc;
   next(pc) := 
     case
-      pc=nc : en;              
---    pc=nc : {nc,en};              
+--      pc=nc : en;              
+      pc=nc : {nc,en};              
       pc=en & turn=id : cr;   -- get into critical section 
       pc=cr : ex;             -- get out of critical section right away
       pc=ex : nc;
@@ -26,8 +26,7 @@ ASSIGN
       pc=ex : (turn+1) mod 2;
       TRUE : turn;
     esac;
-FAIRNESS
-  running
+FAIRNESS running
 
 MODULE main
 VAR
@@ -41,17 +40,25 @@ VAR
 SPEC NAME 
   mutex := AG !(p0.pc=cr & p1.pc=cr)  -- holds
 
+
+
+
+
+
+
+
+    
 -- liveness/progress: eventual entry for p0
 SPEC NAME
-  ee4p0 := AG (p0.pc=nc -> AF p0.pc=cr)  -- holds
+  ee4p0 := AG (p0.pc=en -> AF p0.pc=cr)  -- holds, if 'nc' of p1 always terminates
 
 -- liveness/progress: eventual entry for p1
 SPEC NAME
-  ee4p1 := AG (p1.pc=nc -> AF p1.pc=cr)  -- holds
+  ee4p1 := AG (p1.pc=en -> AF p1.pc=cr)  -- holds, if 'nc' of p1 always terminates
 
 -- liveness/progress: p0 in critical section infintely often
 SPEC NAME
-  p0inf := AG AF p0.pc=cr  -- holds
+  p0inf := AG AF p0.pc=cr  -- holds, if 'nc' of p1 always terminates
 
 -- liveness/progreess: p1 in critical section infintely often
 SPEC NAME
